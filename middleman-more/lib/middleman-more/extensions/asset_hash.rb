@@ -42,7 +42,7 @@ module Middleman
             if resource.template? # if it's a template, render it out
               # Render through the Rack interface so middleware and mounted apps get a shot
               rack_client = ::Rack::Test::Session.new(@app.class)
-              response = rack_client.get(URI.escape(resource.destination_path), {}, { "bypass_asset_hash" => true })
+              response = rack_client.get(URI.escape(resource.destination_path), {}, { "bypass_asset_hash" => 'true' })
               raise "#{resource.path} should be in the sitemap!" unless response.status == 200
 
               digest = Digest::SHA1.hexdigest(response.body)[0..7]
@@ -70,7 +70,7 @@ module Middleman
           status, headers, response = @rack_app.call(env)
 
           # We don't want to use this middleware when rendering files to figure out their hash!
-          return [status, headers, response] if env["bypass_asset_hash"]
+          return [status, headers, response] if env["bypass_asset_hash"] == 'true'
 
           path = @middleman_app.full_path(env["PATH_INFO"])
           dirpath = Pathname.new(File.dirname(path))
